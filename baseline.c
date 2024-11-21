@@ -3,27 +3,11 @@
 #include<stdbool.h>
 #include<math.h>
 #include<float.h> // i'm using this to get the random range
-#include <time.h>
+#include <sys/time.h>
 
-#define REPEAT_MEASURES 100
+#include "func.h"
 
-bool checkSym(const int N, const float M[N][N]){
-  for(int i=0; i<N; i++){
-    for(int j=0; j<N; j++){
-      if(M[i][j] != M[j][i]){ return false; }
-    }
-  }
-
-  return true;
-}
-
-void matTranspose(const int N, const float M[N][N], float ret[N][N]){
-  for(int i=0; i<N; i++){
-    for(int j=0; j<N; j++){
-      ret[i][j] = M[j][i];
-    }
-  }
-}
+#define REPEAT_MEASURES 1
 
 int main(int argc, char*argv[]){
   if (argc != 2) {
@@ -49,29 +33,20 @@ int main(int argc, char*argv[]){
   }
 
   double cpu_time_used;
-  clock_t start, end;
-  // print 100 wall-clock time measures for checkSym
-  for(int i=0; i<REPEAT_MEASURES; i++){
+  struct timeval start, end;
 
-	  start = clock();
-    checkSym(N, M);
-	  end = clock();
 
-    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-    printf("%f\n", cpu_time_used);
-  }
+  // wall-clock should account for mem allocation
+  gettimeofday(&start, NULL);
+  checkSym(N, M);
+  gettimeofday(&end, NULL);
 
-  // print 100 wall-clock time measures for matTranspose
-  for(int i=0; i<REPEAT_MEASURES; i++){
+  long seconds = end.tv_sec - start.tv_sec;
+  long microseconds = end.tv_usec - start.tv_usec;
+  double elapsed = seconds + 1e-6*microseconds;
 
-	  start = clock();
-    matTranspose(N, M, T);
-	  end = clock();
-
-    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-    printf("%f\n", cpu_time_used);
-  }
-
+  printf("Elapsed: %.6f s\n", elapsed);
+  
 
   return 0;
 }
