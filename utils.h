@@ -1,7 +1,7 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
-#include<strings.h>
+#include<string.h>
 
 bool isPowerTwo(long N){
   return (N != 0) && ((N & (N - 1)) == 0);

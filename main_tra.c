@@ -16,8 +16,9 @@ int main(int argc, char*argv[]){
 
   if(set.DEBUG) printf("DEBUG: Allocating matrix M of size %ld.\n", set.N);
   float* M = (float*)malloc(set.N * set.N * sizeof(float));
+  float* T = (float*)malloc(set.N * set.N * sizeof(float));
 
-  if(M == NULL){
+  if(M == NULL || T == NULL){
     fprintf(stderr, "Could not initial matrix of size %s.\n", argv[1]);
   }
 
@@ -31,22 +32,20 @@ int main(int argc, char*argv[]){
   struct timeval start, end;
 
 
-  if(set.DEBUG) printf("DEBUG: Starting Symmetry Check.\n");
+  if(set.DEBUG) printf("DEBUG: Starting Matrix Transposition Check.\n");
 
   gettimeofday(&start, NULL);
-  bool sym = checkSym(M, set.N);
+  matTranspose_CO(M, T, set.N, 0, set.N, 0, set.N);
   gettimeofday(&end, NULL);
-
-  if(sym){ printf("Matrix is symmetric.\n"); }
-  else { printf("Matrix is NOT symmetric.\n"); }
 
   long seconds = end.tv_sec - start.tv_sec;
   long microseconds = end.tv_usec - start.tv_usec;
   double elapsed = seconds + 1e-6*microseconds;
 
-  printf("Elapsed: %.6f s\n", elapsed);
+  printf("Cache-oblivious Elapsed: %.6f s\n", elapsed);
 
   free(M);
+  free(T);
   
 
   return 0;
