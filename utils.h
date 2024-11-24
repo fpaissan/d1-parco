@@ -12,6 +12,7 @@ typedef struct {
   const long N; // size of the initialized matrices
 } ExpSetup;
 
+
 ExpSetup parse_setup(int argc, char*argv[]){
   if (argc != 2) {
     fprintf(stderr, "Usage: %s <long-integer>\n", argv[0]);

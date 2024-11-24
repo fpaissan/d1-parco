@@ -24,6 +24,9 @@ int main(int argc, char*argv[]){
   if(set.DEBUG) printf("DEBUG: Initializing M to be symmetric.\n");
   generate_symmetric_matrix(M, set.N);
 
+  // if(set.DEBUG) printf("DEBUG: Initializing M with random values.\n");
+  // generate_uniform_random(M, set.N);
+
   double cpu_time_used;
   struct timeval start, end;
 
@@ -31,8 +34,11 @@ int main(int argc, char*argv[]){
   if(set.DEBUG) printf("DEBUG: Starting Symmetry Check.\n");
 
   gettimeofday(&start, NULL);
-  checkSym(M, set.N);
+  bool sym = checkSym(M, set.N);
   gettimeofday(&end, NULL);
+
+  if(sym){ printf("Matrix is symmetric.\n"); }
+  else { printf("Matrix is NOT symmetric.\n"); }
 
   long seconds = end.tv_sec - start.tv_sec;
   long microseconds = end.tv_usec - start.tv_usec;
