@@ -6,39 +6,32 @@
 #include <sys/time.h>
 
 #include "func.h"
+#include "utils.h"
 
 #define REPEAT_MEASURES 1
 
 int main(int argc, char*argv[]){
-  if (argc != 2) {
-    fprintf(stderr, "Usage: %s <long-integer>\n", argv[0]);
-    return 1;
+
+  ExpSetup set = parse_setup(argc, argv);
+
+  if(set.DEBUG) printf("DEBUG: Allocating matrix M of size %ld.\n", set.N);
+  float* M = (float*)malloc(set.N * set.N * sizeof(float));
+
+  if(M == NULL){
+    fprintf(stderr, "Could not initial matrix of size %s.\n", argv[1]);
   }
 
-  char *endptr; // to check for conversion errors
-  const long N = strtol(argv[1], &endptr, 10);
-
-  if (*endptr != '\0') {
-    fprintf(stderr, "Invalid number: %s\n", argv[1]);
-    return 1; 
-  }
-
-  float M[N][N], T[N][N];
-
-  // uniform init on float range
-  for(int i=0; i<N; i++){
-    for(int j=0; j<N; j++){
-      M[i][j] = (float) rand() / (RAND_MAX) * (FLT_MAX - FLT_MIN) + FLT_MIN;
-    }
-  }
+  if(set.DEBUG) printf("DEBUG: Initializing M to be symmetric.\n");
+  generate_symmetric_matrix(M, set.N);
 
   double cpu_time_used;
   struct timeval start, end;
 
 
-  // wall-clock should account for mem allocation
+  if(set.DEBUG) printf("DEBUG: Starting Symmetry Check.\n");
+
   gettimeofday(&start, NULL);
-  checkSym(N, M);
+  checkSym(M, set.N);
   gettimeofday(&end, NULL);
 
   long seconds = end.tv_sec - start.tv_sec;
@@ -46,6 +39,8 @@ int main(int argc, char*argv[]){
   double elapsed = seconds + 1e-6*microseconds;
 
   printf("Elapsed: %.6f s\n", elapsed);
+
+  free(M);
   
 
   return 0;
