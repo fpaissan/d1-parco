@@ -130,8 +130,20 @@ void matTransposeTiled(float* matrix, float* result,
     }
 }
 
-void matTransposeOMP(float* matrix, float* result,
-                     const long size, const int tile_size)
+void matTransposeOMP(float* M, float* T, const long N)
+{
+    #pragma omp parallel for collapse(2)
+    for(int j=0; j < N; j++)
+    {
+        for(int i=0; i < N; i++)
+        {
+            T[i*N + j] = M[j*N + i];
+        }
+    }
+}
+
+void matTransposeTiledOMP(float* matrix, float* result,
+                          const long size, const int tile_size)
 {
     // First process diagonal tiles
     #pragma omp parallel for
@@ -142,10 +154,7 @@ void matTransposeOMP(float* matrix, float* result,
         {
             for (int tj = i; tj < i + tile_size && tj < size; tj++)
             {
-                #pragma omp critical
-                {
-                    result[tj * size + ti] = matrix[ti * size + tj];
-                }
+                result[tj * size + ti] = matrix[ti * size + tj];
             }
         }
 
@@ -157,13 +166,10 @@ void matTransposeOMP(float* matrix, float* result,
             {
                 for (int tj = j; tj < j + tile_size && tj < size; tj++)
                 {
-                    #pragma omp critical
-                    {
-                        // Transpose element (i,j)
-                        result[tj * size + ti] = matrix[ti * size + tj];
-                        // Transpose element (j,i)
-                        result[ti * size + tj] = matrix[tj * size + ti];
-                    }
+                    // Transpose element (i,j)
+                    result[tj * size + ti] = matrix[ti * size + tj];
+                    // Transpose element (j,i)
+                    result[ti * size + tj] = matrix[tj * size + ti];
                 }
             }
         }
