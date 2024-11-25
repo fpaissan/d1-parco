@@ -10,7 +10,7 @@ def compile(file, flags=[]):
 
 
 if __name__ == "__main__":
-    compile("baseline.c")
+    compile("main_sym.c")
 
     execute = ["./a.out", "1000"]
     result = subprocess.run(execute, stdout=subprocess.PIPE, text=True)

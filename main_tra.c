@@ -44,6 +44,38 @@ int main(int argc, char*argv[]){
 
   printf("Cache-oblivious Elapsed: %.6f s\n", elapsed);
 
+  gettimeofday(&start, NULL);
+  matTranspose(M, T, set.N);
+  gettimeofday(&end, NULL);
+
+  seconds = end.tv_sec - start.tv_sec;
+  microseconds = end.tv_usec - start.tv_usec;
+  elapsed = seconds + 1e-6*microseconds;
+
+  printf("Baseline Elapsed: %.6f s\n", elapsed);
+
+  gettimeofday(&start, NULL);
+  matTransposeImp(M, T, set.N);
+  gettimeofday(&end, NULL);
+
+  seconds = end.tv_sec - start.tv_sec;
+  microseconds = end.tv_usec - start.tv_usec;
+  elapsed = seconds + 1e-6*microseconds;
+
+  printf("Imp Elapsed: %.6f s\n", elapsed);
+
+  gettimeofday(&start, NULL);
+  // Tile size should be balanced. I want to avoid overhead due to small tiles
+  // If tiles are to big I get cache thrashing
+  matTransposeTiled(M, T, set.N, 64);
+  gettimeofday(&end, NULL);
+
+  seconds = end.tv_sec - start.tv_sec;
+  microseconds = end.tv_usec - start.tv_usec;
+  elapsed = seconds + 1e-6*microseconds;
+
+  printf("Tiled Elapsed: %.6f s\n", elapsed);
+
   free(M);
   free(T);
   

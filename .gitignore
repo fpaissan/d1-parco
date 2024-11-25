@@ -1,3 +1,9 @@
+*.orig
+
+bench
+sym
+tra
+
 # Prerequisites
 *.d
 
