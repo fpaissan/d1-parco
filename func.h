@@ -1,7 +1,9 @@
 #ifndef __FUNC_H__
 #define __FUNC_H__
 
+#ifdef _OPENMP
 #include<omp.h>
+#endif
 
 bool checkSym(float* M, const long N)
 {
