@@ -43,21 +43,24 @@ bool checkSymImp(float* M, const long N)
 
 bool checkSymOMP(float* M, const long N)
 {
-    /* BENCHMARKING NOTES:
-     * To fairly benchmark this function, we need
-     * M to be a symmetric matrix. Otherwise, the kernel
-     * might exist before checking all the combinations. */
+    bool sym = true;
     #pragma omp parallel for collapse(2)
     for(int i=0; i < N / 2; i++)
     {
         for(int j=0; j < N / 2; j++)
         {
             // avoid if to remove N^2 conditions
-            if(M[i*N + j] != M[j* N + i]) return false;
+            if(M[i*N + j] != M[j* N + i])
+            {
+                #pragma omp critical
+                {
+                    sym = false;
+                }
+            }
         }
     }
 
-    return true;
+    return sym;
 }
 
 void matTranspose(float* M, float* T, const long N)
