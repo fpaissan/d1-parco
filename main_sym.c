@@ -39,13 +39,16 @@ int main(int argc, char*argv[])
     bool sym = checkSym(M, set.N);
     gettimeofday(&end, NULL);
 
-    if(sym)
+    if (set.DEBUG)
     {
-        printf("Matrix is symmetric.\n");
-    }
-    else
-    {
-        printf("Matrix is NOT symmetric.\n");
+        if(sym)
+        {
+            printf("DEBUG: Matrix is symmetric.\n");
+        }
+        else
+        {
+            printf("DEBUG: Matrix is NOT symmetric.\n");
+        }
     }
 
     long seconds = end.tv_sec - start.tv_sec;
@@ -58,13 +61,16 @@ int main(int argc, char*argv[])
     sym = checkSymImp(M, set.N);
     gettimeofday(&end, NULL);
 
-    if(sym)
+    if (set.DEBUG)
     {
-        printf("Matrix is symmetric.\n");
-    }
-    else
-    {
-        printf("Matrix is NOT symmetric.\n");
+        if(sym)
+        {
+            printf("DEBUG: Matrix is symmetric.\n");
+        }
+        else
+        {
+            printf("DEBUG: Matrix is NOT symmetric.\n");
+        }
     }
 
     seconds = end.tv_sec - start.tv_sec;
@@ -73,8 +79,41 @@ int main(int argc, char*argv[])
 
     printf("Imp Elapsed: %.6f s\n", elapsed);
 
-    free(M);
+    gettimeofday(&start, NULL);
+    sym = checkSymOMP(M, set.N);
+    gettimeofday(&end, NULL);
 
+    if (set.DEBUG)
+    {
+        if(sym)
+        {
+            printf("DEBUG: Matrix is symmetric.\n");
+        }
+        else
+        {
+            printf("DEBUG: Matrix is NOT symmetric.\n");
+        }
+    }
+
+    seconds = end.tv_sec - start.tv_sec;
+    microseconds = end.tv_usec - start.tv_usec;
+    elapsed = seconds + 1e-6*microseconds;
+
+    printf("OMP Elapsed: %.6f s\n", elapsed);
+
+    if (set.DEBUG)
+    {
+        if(sym)
+        {
+            printf("DEBUG: Matrix is symmetric.\n");
+        }
+        else
+        {
+            printf("DEBUG: Matrix is NOT symmetric.\n");
+        }
+    }
+
+    free(M);
 
     return 0;
 }
