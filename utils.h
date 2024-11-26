@@ -10,7 +10,7 @@ bool isPowerTwo(long N)
 
 typedef enum
 {
-    SEQUENTIAL, IMPLICIT, OMP
+    SEQUENTIAL, IMPLICIT, OMP, TILED, TILEDOMP, CO
 } strat;
 
 typedef struct
@@ -66,9 +66,21 @@ ExpSetup parse_setup(int argc, char*argv[])
     {
         S = SEQUENTIAL;
     }
+    else if (strcmp(strategy, "TILED") == 0)
+    {
+        S = TILED;
+    }
+    else if (strcmp(strategy, "TILEDOMP") == 0)
+    {
+        S = TILEDOMP;
+    }
+    else if (strcmp(strategy, "CO") == 0)
+    {
+        S = CO;
+    }
     else
     {
-        fprintf(stderr, "Arguments are messed up. Strategy can be IMP / OMP / SEQ.\n");
+        fprintf(stderr, "Arguments are messed up. Strategy can be IMP / OMP / SEQ for SymCheck and IMP / OMP / SEQ / TILED / TILEDOMP / CO for Tranpose.\n");
         exit(1);
     }
 

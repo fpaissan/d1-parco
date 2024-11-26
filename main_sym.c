@@ -8,7 +8,7 @@
 #include "func.h"
 #include "utils.h"
 
-#define REPEAT_MEASURES 10
+#define REPEAT_MEASURES 100
 
 int main(int argc, char*argv[])
 {
@@ -40,14 +40,24 @@ int main(int argc, char*argv[])
     bool sym;
     for(int i=0; i<REPEAT_MEASURES; i++)
     {
-        gettimeofday(&start, NULL);
         if(set.STRAT == SEQUENTIAL)
+        {
+            gettimeofday(&start, NULL);
             sym = checkSym(M, set.N);
+            gettimeofday(&end, NULL);
+        }
         else if(set.STRAT == IMPLICIT)
+        {
+            gettimeofday(&start, NULL);
             sym = checkSymImp(M, set.N);
+            gettimeofday(&end, NULL);
+        }
         else if(set.STRAT == OMP)
+        {
+            gettimeofday(&start, NULL);
             sym = checkSymOMP(M, set.N);
-        gettimeofday(&end, NULL);
+            gettimeofday(&end, NULL);
+        }
 
         seconds = end.tv_sec - start.tv_sec;
         microseconds = end.tv_usec - start.tv_usec;

@@ -30,6 +30,8 @@ bool checkSymImp(float* M, const long N)
      * To fairly benchmark this function, we need
      * M to be a symmetric matrix. Otherwise, the kernel
      * might exist before checking all the combinations. */
+#pragma simd
+    // #pragma unroll(4)
     for(int j=0; j < N / 2; j++)
     {
         for(int i=0; i < N / 2; i++)

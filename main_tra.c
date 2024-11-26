@@ -8,7 +8,7 @@
 #include "func.h"
 #include "utils.h"
 
-#define REPEAT_MEASURES 1
+#define REPEAT_MEASURES 10
 
 int main(int argc, char*argv[])
 {
@@ -36,126 +36,55 @@ int main(int argc, char*argv[])
 
     if(set.DEBUG) printf("DEBUG: Starting Matrix Transposition Check.\n");
 
-    gettimeofday(&start, NULL);
-    matTranspose_CO(M, T, set.N, 0, set.N, 0, set.N);
-    gettimeofday(&end, NULL);
 
-    long seconds = end.tv_sec - start.tv_sec;
-    long microseconds = end.tv_usec - start.tv_usec;
-    double elapsed = seconds + 1e-6*microseconds;
-
-    printf("Cache-oblivious Elapsed: %.6f s\n", elapsed);
-    if(set.DEBUG)
+    long seconds, microseconds;
+    double elapsed;
+    for(int i=0; i<REPEAT_MEASURES; i++)
     {
-        if(checkTranspose(M, T, set.N))
+        if(set.STRAT == SEQUENTIAL)
         {
-            printf("DEBUG: Transpose successful.\n");
+            gettimeofday(&start, NULL);
+            matTranspose(M, T, set.N);
+            gettimeofday(&end, NULL);
         }
-        else
+        else if(set.STRAT == IMPLICIT)
         {
-            printf("DEBUG: Something is off in transpose. DO NOT IGNORE THIS!\n");
+            gettimeofday(&start, NULL);
+            matTransposeImp(M, T, set.N);
+            gettimeofday(&end, NULL);
         }
+        else if(set.STRAT == TILED)
+        {
+            gettimeofday(&start, NULL);
+            matTransposeTiled(M, T, set.N, 64);
+            gettimeofday(&end, NULL);
+        }
+        else if(set.STRAT == TILEDOMP)
+        {
+            gettimeofday(&start, NULL);
+            matTransposeTiledOMP(M, T, set.N, 64);
+            gettimeofday(&end, NULL);
+        }
+        else if(set.STRAT == OMP)
+        {
+            gettimeofday(&start, NULL);
+            matTransposeOMP(M, T, set.N);
+            gettimeofday(&end, NULL);
+        }
+        else if(set.STRAT == CO)
+        {
+            gettimeofday(&start, NULL);
+            matTranspose_CO(M, T, set.N, 0, set.N, 0, set.N);
+            gettimeofday(&end, NULL);
+        }
+
+        seconds = end.tv_sec - start.tv_sec;
+        microseconds = end.tv_usec - start.tv_usec;
+        elapsed += seconds + 1e-6*microseconds;
     }
+    elapsed /= REPEAT_MEASURES;
 
-    gettimeofday(&start, NULL);
-    matTranspose(M, T, set.N);
-    gettimeofday(&end, NULL);
-
-    seconds = end.tv_sec - start.tv_sec;
-    microseconds = end.tv_usec - start.tv_usec;
-    elapsed = seconds + 1e-6*microseconds;
-
-    printf("Baseline Elapsed: %.6f s\n", elapsed);
-    if(set.DEBUG)
-    {
-        if(checkTranspose(M, T, set.N))
-        {
-            printf("DEBUG: Transpose successful.\n");
-        }
-        else
-        {
-            printf("DEBUG: Something is off in transpose. DO NOT IGNORE THIS!\n");
-        }
-    }
-
-    gettimeofday(&start, NULL);
-    matTransposeImp(M, T, set.N);
-    gettimeofday(&end, NULL);
-
-    seconds = end.tv_sec - start.tv_sec;
-    microseconds = end.tv_usec - start.tv_usec;
-    elapsed = seconds + 1e-6*microseconds;
-
-    printf("Imp Elapsed: %.6f s\n", elapsed);
-    if(set.DEBUG)
-    {
-        if(checkTranspose(M, T, set.N))
-        {
-            printf("DEBUG: Transpose successful.\n");
-        }
-        else
-        {
-            printf("DEBUG: Something is off in transpose. DO NOT IGNORE THIS!\n");
-        }
-    }
-
-    gettimeofday(&start, NULL);
-    // Tile size should be balanced. I want to avoid overhead due to small tiles
-    // If tiles are to big I get cache thrashing
-    matTransposeOMP(M, T, set.N);
-    gettimeofday(&end, NULL);
-
-    seconds = end.tv_sec - start.tv_sec;
-    microseconds = end.tv_usec - start.tv_usec;
-    elapsed = seconds + 1e-6*microseconds;
-
-    printf("OMP Elapsed: %.6f s\n", elapsed);
-    if(set.DEBUG)
-    {
-        if(checkTranspose(M, T, set.N))
-        {
-            printf("DEBUG: Transpose successful.\n");
-        }
-        else
-        {
-            printf("DEBUG: Something is off in transpose. DO NOT IGNORE THIS!\n");
-        }
-    }
-
-    gettimeofday(&start, NULL);
-    // Tile size should be balanced. I want to avoid overhead due to small tiles
-    // If tiles are to big I get cache thrashing
-    matTransposeTiled(M, T, set.N, 64);
-    gettimeofday(&end, NULL);
-
-    seconds = end.tv_sec - start.tv_sec;
-    microseconds = end.tv_usec - start.tv_usec;
-    elapsed = seconds + 1e-6*microseconds;
-
-    printf("Tiled Elapsed: %.6f s\n", elapsed);
-    if(set.DEBUG)
-    {
-        if(checkTranspose(M, T, set.N))
-        {
-            printf("DEBUG: Transpose successful.\n");
-        }
-        else
-        {
-            printf("DEBUG: Something is off in transpose. DO NOT IGNORE THIS!\n");
-        }
-    }
-
-    gettimeofday(&start, NULL);
-    // Tile size should be balanced. I want to avoid overhead due to small tiles
-    // If tiles are to big I get cache thrashing
-    matTransposeTiledOMP(M, T, set.N, 64);
-    gettimeofday(&end, NULL);
-
-    seconds = end.tv_sec - start.tv_sec;
-    microseconds = end.tv_usec - start.tv_usec;
-    elapsed = seconds + 1e-6*microseconds;
-
-    printf("OMP Tiled Elapsed: %.6f s\n", elapsed);
+    printf("Elapsed: %.6f s\n", elapsed);
     if(set.DEBUG)
     {
         if(checkTranspose(M, T, set.N))
