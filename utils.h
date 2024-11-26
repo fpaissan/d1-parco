@@ -8,21 +8,21 @@ bool isPowerTwo(long N)
     return (N != 0) && ((N & (N - 1)) == 0);
 }
 
+typedef enum
+{
+    SEQUENTIAL, IMPLICIT, OMP
+} strat;
+
 typedef struct
 {
-    bool DEBUG; // handles printing schemes
+    const bool DEBUG; // handles printing schemes
     const long N; // size of the initialized matrices
+    const strat STRAT;
 } ExpSetup;
 
 
 ExpSetup parse_setup(int argc, char*argv[])
 {
-    if (argc != 2)
-    {
-        fprintf(stderr, "Usage: %s <long-integer>\n", argv[0]);
-        exit(1);
-    }
-
     char *endptr; // to check for conversion errors
     const long N = strtol(argv[1], &endptr, 10);
 
@@ -34,6 +34,41 @@ ExpSetup parse_setup(int argc, char*argv[])
     else if (!isPowerTwo(N))
     {
         fprintf(stderr, "Number should be a power of two, and is now: %s\n", argv[1]);
+        exit(1);
+    }
+
+    const char *strategy = NULL;
+    for (int i = 1; i < argc; i++)
+    {
+        // Handle "--strategy=value" format
+        if (strncmp(argv[i], "--strategy=", 11) == 0)
+        {
+            strategy = argv[i] + 11; // Get the value part
+        }
+        // Handle "--strategy value" format
+        else if (strcmp(argv[i], "--strategy") == 0 && i + 1 < argc)
+        {
+            strategy = argv[i + 1];
+            i++; // Skip the value argument
+        }
+    }
+    strat S;
+
+    if (strcmp(strategy, "IMP") == 0)
+    {
+        S = IMPLICIT;
+    }
+    else if (strcmp(strategy, "OMP") == 0)
+    {
+        S = OMP;
+    }
+    else if (strcmp(strategy, "SEQ") == 0)
+    {
+        S = SEQUENTIAL;
+    }
+    else
+    {
+        fprintf(stderr, "Arguments are messed up. Strategy can be IMP / OMP / SEQ.\n");
         exit(1);
     }
 
@@ -59,7 +94,7 @@ ExpSetup parse_setup(int argc, char*argv[])
 
     return (ExpSetup)
     {
-        .DEBUG = debug, .N = N
+        .DEBUG = debug, .N = N, .STRAT = S
     };
 }
 
