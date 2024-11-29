@@ -13,8 +13,8 @@ for strat in "${strategies[@]}"; do
         # Create experiment folder
         mkdir -p symm_results_$flag
     
-        gcc -o sym -$flag -fopt-info-optimized="${flag}_sym.log" -fopenmp -march=native main_sym.c
-        echo gcc -o sym -$flag -fopt-info-optimized="${flag}_sym.log" -march=native -fopenmp main_sym.c
+        gcc -o sym -$flag -fopt-info-optimized="${flag}_${strat}_sym.log" -fopenmp -march=native main_sym.c
+        echo gcc -o sym -$flag -fopt-info-optimized="${flag}_${strat}_sym.log" -march=native -fopenmp main_sym.c
         
         # Loop through the powers of 2 from 2^4 to 2^12, as per requirements
         for i in $(seq 4 12); do
