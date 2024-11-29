@@ -8,7 +8,7 @@
 #include "func.h"
 #include "utils.h"
 
-#define REPEAT_MEASURES 100
+#define REPEAT_MEASURES 2000
 
 int main(int argc, char*argv[])
 {
