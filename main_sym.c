@@ -36,7 +36,7 @@ int main(int argc, char*argv[])
     if(set.DEBUG) printf("DEBUG: Starting Symmetry Check.\n");
 
     long seconds, microseconds;
-    double elapsed;
+    double elapsed, delta;
     bool sym;
     for(int i=0; i<REPEAT_MEASURES; i++)
     {
@@ -61,7 +61,9 @@ int main(int argc, char*argv[])
 
         seconds = end.tv_sec - start.tv_sec;
         microseconds = end.tv_usec - start.tv_usec;
-        elapsed += seconds + 1e-6*microseconds;
+        delta = seconds + 1e-6*microseconds;
+        if(!set.DEBUG) printf("%f\n", delta);
+        elapsed += delta;
     }
     elapsed /= REPEAT_MEASURES;
 
@@ -77,7 +79,7 @@ int main(int argc, char*argv[])
         }
     }
 
-    printf("Elapsed: %.6f s\n", elapsed);
+    if(set.DEBUG) printf("Elapsed: %.6f s\n", elapsed);
 
     free(M);
 

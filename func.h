@@ -26,21 +26,24 @@ bool checkSym(float* M, const long N)
 
 bool checkSymImp(float* M, const long N)
 {
-    /* BENCHMARKING NOTES:
-     * To fairly benchmark this function, we need
-     * M to be a symmetric matrix. Otherwise, the kernel
-     * might exist before checking all the combinations. */
-#pragma simd
-    // #pragma unroll(4)
-    for(int j=0; j < N / 2; j++)
+    bool sym = true;
+    for (int i = 0; i < N / 2; i++)
     {
-        for(int i=0; i < N / 2; i++)
+#pragma simd
+#pragma ivdep // Hint: ignore dependencies for vectorization
+// #pragma unroll 4 // Suggest unrolling for improved performance
+        for (int j = 0; j < N / 2; j++)
         {
-            if(M[i*N + j] != M[j* N + i]) return false;
+            // __builtin_prefetch(&M[i * N + j + 1], 0, 1);
+            // __builtin_prefetch(&M[j * N + i + 1], 0, 1);
+
+            // Compare symmetric elements
+            if (M[i * N + j] != M[j * N + i])
+                sym = false;
         }
     }
 
-    return true;
+    return sym;
 }
 
 bool checkSymOMP(float* M, const long N)
@@ -80,10 +83,9 @@ void matTransposeImp(float* M, float* T, const long N)
 {
     for(int j=0; j < N; j++)
     {
-#pragma unroll(16)
 #pragma simd
 #pragma ivdep
-        // #pragma prefetch M[j*N:(j+1)*N]
+#pragma unroll(4)
         for(int i=0; i < N; i++)
         {
             T[i*N + j] = M[j*N + i];

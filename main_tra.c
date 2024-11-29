@@ -9,6 +9,7 @@
 #include "utils.h"
 
 #define REPEAT_MEASURES 10
+#define ALIGNMENT 32  // bytes
 
 int main(int argc, char*argv[])
 {
@@ -16,19 +17,26 @@ int main(int argc, char*argv[])
     ExpSetup set = parse_setup(argc, argv);
 
     if(set.DEBUG) printf("DEBUG: Allocating matrix M of size %ld.\n", set.N);
-    float* M = (float*)malloc(set.N * set.N * sizeof(float));
-    float* T = (float*)malloc(set.N * set.N * sizeof(float));
+    // float* M = (float*)malloc(set.N * set.N * sizeof(float));
+    // float* T = (float*)malloc(set.N * set.N * sizeof(float));
+    float* M = (float*)aligned_alloc(ALIGNMENT, set.N * set.N * sizeof(float));
+    float* T = (float*)aligned_alloc(ALIGNMENT, set.N * set.N * sizeof(float));
 
     if(M == NULL || T == NULL)
     {
         fprintf(stderr, "Could not initial matrix of size %s.\n", argv[1]);
     }
 
+    if(set.DEBUG)
+    {
+        printf("DEBUG: Checking alignment for M:");
+        check_alignment(M, 32);
+        printf("DEBUG: Checking alignment for T:");
+        check_alignment(T, 32);
+    }
+
     if(set.DEBUG) printf("DEBUG: Initializing M to be symmetric.\n");
     generate_symmetric_matrix(M, set.N);
-
-    // if(set.DEBUG) printf("DEBUG: Initializing M with random values.\n");
-    // generate_uniform_random(M, set.N);
 
     double cpu_time_used;
     struct timeval start, end;

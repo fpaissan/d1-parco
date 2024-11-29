@@ -2,6 +2,7 @@
 #define __UTILS_H__
 
 #include<string.h>
+#include<stdint.h>
 
 bool isPowerTwo(long N)
 {
@@ -151,6 +152,18 @@ bool checkTranspose(float *A, float* B, const long N)
     }
 
     return true;
+}
+
+void check_alignment(void *ptr, size_t alignment)
+{
+    if ((uintptr_t)ptr % alignment == 0)
+    {
+        printf("Pointer is aligned to %zu bytes.\n", alignment);
+    }
+    else
+    {
+        printf("Pointer is NOT aligned to %zu bytes.\n", alignment);
+    }
 }
 
 #endif // !__UTILS_H__
