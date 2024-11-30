@@ -8,7 +8,7 @@
 #include "func.h"
 #include "utils.h"
 
-#define REPEAT_MEASURES 10
+#define REPEAT_MEASURES 2000
 #define ALIGNMENT 32  // bytes
 
 int main(int argc, char*argv[])
@@ -46,7 +46,7 @@ int main(int argc, char*argv[])
 
 
     long seconds, microseconds;
-    double elapsed;
+    double elapsed, delta;
     for(int i=0; i<REPEAT_MEASURES; i++)
     {
         if(set.STRAT == SEQUENTIAL)
@@ -88,11 +88,14 @@ int main(int argc, char*argv[])
 
         seconds = end.tv_sec - start.tv_sec;
         microseconds = end.tv_usec - start.tv_usec;
-        elapsed += seconds + 1e-6*microseconds;
+        delta = seconds + 1e-6*microseconds;
+        if(!set.DEBUG) printf("%f\n", delta);
+        elapsed += delta;
     }
     elapsed /= REPEAT_MEASURES;
 
-    printf("Elapsed: %.6f s\n", elapsed);
+    if(set.DEBUG) printf("Elapsed: %.6f s\n", elapsed);
+
     if(set.DEBUG)
     {
         if(checkTranspose(M, T, set.N))

@@ -82,14 +82,18 @@ void matTranspose(float* M, float* T, const long N)
 
 void matTransposeImp(float* M, float* T, const long N)
 {
-    for(int j=0; j < N; j++)
+    #pragma ivdep
+    #pragma unroll 2
+    for(int j=0; j < N; j=j+2)
     {
-#pragma simd
-#pragma ivdep
-#pragma unroll(4)
-        for(int i=0; i < N; i++)
+        #pragma ivdep
+        #pragma unroll 2
+        for(int i=0; i < N; i=i+2)
         {
             T[i*N + j] = M[j*N + i];
+            T[(i+1)*N + j] = M[j*N + (i+1)];
+            T[(i+1)*N + j+1] = M[(j+1)*N + (i+1)];
+            T[i*N + j+1] = M[(j+1)*N + i];
         }
     }
 }
