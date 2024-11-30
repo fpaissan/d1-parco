@@ -12,15 +12,22 @@ plt.style.use(["science", "no-latex"])
 if __name__ == "__main__":
     OPT = sys.argv[1]
 
+    output_folder = Path("plots/sym/")
     STRATEGIES = ["SEQ", "IMP", "OMP"]
     LOGS = []
     for s in STRATEGIES:
         for pow in range(4, 13):
-            LOGS.append(f"{s}_{2**pow}.txt")
+            if s != "OMP":
+                THREADS = [1]
+            else:
+                THREADS = [5, 15, 30, 40]
+
+            for t in THREADS:
+                LOGS.append(f"{s}_{2**pow}_t{t}.txt")
 
         results = {}
         for fname in LOGS:
-            log_folder = Path(f"symm_results_{OPT}")
+            log_folder = Path(f"results/symm_results_{OPT}")
             with open(log_folder / fname, "r") as f:
                 logs = f.readlines()
 
@@ -31,31 +38,33 @@ if __name__ == "__main__":
 
             results[fname] = raw
 
-        powers_of_two = list(range(4, 13))  # Corresponding to 2^4 to 2^12
-        data_by_power = {2**pow: [] for pow in powers_of_two}
+    # Organize results by strategy and threads
+    grouped_results = {}
+    for fname, data in results.items():
+        strategy, size, threads = fname.split("_")
+        size = int(size)  # Power of two size
+        threads = int(threads[1:-4])  # Extract thread count from t{threads}.txt
 
-        for fname, raw_data in results.items():
-            # Extract power of two from the filename
-            _, size_with_txt = fname.split("_")
-            size = int(size_with_txt.split(".")[0])  # Extract 2^power
-            data_by_power[size].extend(raw_data)
+        if (strategy, threads) not in grouped_results:
+            grouped_results[(strategy, threads)] = {}
 
-        # Prepare data for plotting
+        if size not in grouped_results[(strategy, threads)]:
+            grouped_results[(strategy, threads)][size] = []
+
+        grouped_results[(strategy, threads)][size].extend(data)
+
+    # Create a plot for each configuration
+    for (strategy, threads), data_by_size in grouped_results.items():
+        powers_of_two = sorted(data_by_size.keys())
         violin_data = []
         violin_labels = []
-        means = []  # To store mean values for annotations
-        maxv = []
 
-        for pow in powers_of_two:
-            size = 2**pow
-            values = data_by_power[size]
-            violin_data.extend(values)
-            violin_labels.extend([f"2^{pow}"] * len(values))
-            maxv.append(np.max(values))
-            means.append(np.mean(values))  # Compute mean for each group
+        for size in powers_of_two:
+            violin_data.extend(data_by_size[size])
+            violin_labels.extend([f"2^{int(np.log2(size))}"] * len(data_by_size[size]))
 
-        # Create the violin plot
-        # plt.figure(figsize=(6, 5))
+        # Generate the plot
+        # plt.figure(figsize=(12, 7))
         sns.violinplot(
             x=violin_labels,
             y=violin_data,
@@ -64,17 +73,18 @@ if __name__ == "__main__":
             palette="muted",
         )
 
-        # Adjust y-axis limit to ensure all annotations fit
-        y_max = max(maxv)  # Highest data point
-        annotation_padding = 0.3 * y_max  # 10% padding above the highest point
+        y_max = max(data_by_size[size])
+        annotation_padding = 0.13 * y_max
+        plt.ylim(0, y_max + annotation_padding)
 
-        # Add annotations above the violins
-        # Add annotations just above the max value of each violin
-        for i, (mean, max_val) in enumerate(zip(means, maxv)):
+        # Add annotations
+        for i, size in enumerate(powers_of_two):
+            max_val = max(data_by_size[size])
+            mean_val = np.mean(data_by_size[size])
             plt.text(
-                i if i != 12 else 10,
-                max_val + 0.10 * max_val,  # Place slightly above the max value
-                f"{mean * 1e3:.2f}",
+                i,
+                max_val + 0.01 * max_val,
+                f"{mean_val*1e3:.2f}",
                 ha="center",
                 va="bottom",
                 fontsize=8,
@@ -84,15 +94,12 @@ if __name__ == "__main__":
         # Add labels and title
         plt.xlabel("Power of Two (2^x)")
         plt.ylabel("Time [s]")
-        plt.ylim(0, y_max + annotation_padding)  # Extend y-axis range
-        # plt.semilogy()
-        plt.title(f"Wall-clock time distribution (-{OPT}, {s})")
+        plt.title(f"{strategy} - {sys.argv[1]} - {threads} Threads")
         plt.xticks(rotation=45)  # Rotate labels for better readability
         plt.grid(axis="y", linestyle="--", alpha=0.7)
 
-        # Show the plot
+        # Show or save the plot
         plt.tight_layout()
-        plt.savefig(f"plots/{OPT}_{s}.pdf")
+        plt.savefig(output_folder / f"{sys.argv[1]}_{strategy}_t{threads}.pdf")
         plt.cla()
         plt.clf()
-        # plt.show()
