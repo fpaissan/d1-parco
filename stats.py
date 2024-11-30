@@ -10,9 +10,9 @@ import seaborn as sns
 plt.style.use(["science", "no-latex"])
 
 if __name__ == "__main__":
-    OPT = sys.argv[1]
+    TASK = sys.argv[1]
+    OPT = sys.argv[2]
 
-    output_folder = Path("plots/sym/")
     STRATEGIES = ["SEQ", "IMP", "OMP"]
     LOGS = []
     for s in STRATEGIES:
@@ -27,11 +27,12 @@ if __name__ == "__main__":
 
         results = {}
         for fname in LOGS:
-            log_folder = Path(f"results/symm_results_{OPT}")
+            output_folder = Path(f"plots/{TASK}/")
+            log_folder = Path(f"results/{TASK}_results_{OPT}")
             with open(log_folder / fname, "r") as f:
                 logs = f.readlines()
 
-            raw = np.array(list(map(lambda x: float(x), logs)))
+            raw = np.array(list(map(lambda x: float(x) * 1e3, logs)))
             if len(raw) == 0:
                 print("Log is empty.")
                 exit()
@@ -84,7 +85,7 @@ if __name__ == "__main__":
             plt.text(
                 i,
                 max_val + 0.01 * max_val,
-                f"{mean_val*1e3:.2f}",
+                f"{mean_val:.2f}",
                 ha="center",
                 va="bottom",
                 fontsize=8,
@@ -93,8 +94,8 @@ if __name__ == "__main__":
 
         # Add labels and title
         plt.xlabel("Power of Two (2^x)")
-        plt.ylabel("Time [s]")
-        plt.title(f"{strategy} - {sys.argv[1]} - {threads} Threads")
+        plt.ylabel("Time [ms]")
+        plt.title(f"{strategy} - {OPT} - {threads} Threads")
         plt.xticks(rotation=45)  # Rotate labels for better readability
         plt.grid(axis="y", linestyle="--", alpha=0.7)
 
