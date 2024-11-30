@@ -27,18 +27,19 @@ bool checkSym(float* M, const long N)
 bool checkSymImp(float* M, const long N)
 {
     bool sym = true;
-    for (int i = 0; i < N / 2; i++)
+#pragma GCC unroll 2 // Suggest unrolling for improved performance
+    for (int i = 0; i < N / 2; i=i+2)
     {
-#pragma simd
-#pragma ivdep // Hint: ignore dependencies for vectorization
-// #pragma unroll 4 // Suggest unrolling for improved performance
-        for (int j = 0; j < N / 2; j++)
+// #pragma simd
+// #pragma ivdep // Hint: ignore dependencies for vectorization
+#pragma GCC unroll 2 // Suggest unrolling for improved performance
+        for (int j = 0; j < N / 2; j=j+2)
         {
             // __builtin_prefetch(&M[i * N + j + 1], 0, 1);
             // __builtin_prefetch(&M[j * N + i + 1], 0, 1);
 
             // Compare symmetric elements
-            if (M[i * N + j] != M[j * N + i])
+            if (M[i * N + j] != M[j * N + i] || M[(i+1) * N + j + 1] != M[(j + 1) * N + (i+1)] )
                 sym = false;
         }
     }
