@@ -1,9 +1,16 @@
+/*
+ * Effective Memory Benchmark measurement
+ *
+ * Author: Francesco Paissan, 2024
+ *
+ * Compile with gcc -o bench -O3 -march=native mem_bandwidth.c 
+ */
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
 #include<math.h>
 
-#define AVG_NUMBER 100000
+#define AVG_NUMBER 1000
 #define SIZE (unsigned long) pow(2, 20)
 
 int main(){
