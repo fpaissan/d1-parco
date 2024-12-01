@@ -14,7 +14,7 @@ bool checkSym(float* M, const long N)
      * might exist before checking all the combinations. */
     for(int i=0; i < N / 2; i++)
     {
-        for(int j=0; j < N / 2; j++)
+        for(int j=0; j < i; j++)
         {
             // avoid if to remove N^2 conditions
             if(M[i*N + j] != M[j* N + i]) return false;
@@ -33,7 +33,7 @@ bool checkSymImp(float* M, const long N)
 // #pragma simd
 // #pragma ivdep // Hint: ignore dependencies for vectorization
 #pragma GCC unroll 2 // Suggest unrolling for improved performance
-        for (int j = 0; j < N / 2; j=j+2)
+        for (int j = 0; j < i; j=j+2)
         {
             // __builtin_prefetch(&M[i * N + j + 1], 0, 1);
             // __builtin_prefetch(&M[j * N + i + 1], 0, 1);
@@ -53,7 +53,7 @@ bool checkSymOMP(float* M, const long N)
     #pragma omp parallel for collapse(2)
     for(int i=0; i < N / 2; i++)
     {
-        for(int j=0; j < N / 2; j++)
+        for(int j=0; j < i; j++)
         {
             // avoid if to remove N^2 conditions
             if(M[i*N + j] != M[j* N + i])
