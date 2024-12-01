@@ -15,7 +15,7 @@ plt.style.use(["science", "no-latex"])
 if __name__ == "__main__":
     TASK = sys.argv[1]
     optimization_flag = "O0"  # Example optimization flag
-    STRATEGIES = ["SEQ", "IMP", "OMP", "TILED", "TILEDOMP", "CO"]
+    STRATEGIES = ["SEQ", "IMP", "OMP", "TILED", "TILEDOMP"]
     matrix_sizes = [2**pow for pow in range(4, 13)]  # Sizes from 2^4 to 2^12
 
     # Dictionary to store results
