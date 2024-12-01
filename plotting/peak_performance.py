@@ -1,11 +1,13 @@
-import subprocess
+""" 
+Author: Francesco Paissan
+"""
+
 import sys
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 import scienceplots
-import seaborn as sns
 
 plt.style.use(["science", "no-latex"])
 

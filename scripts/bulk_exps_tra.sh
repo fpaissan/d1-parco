@@ -1,4 +1,5 @@
 #!/bin/bash
+# Author: Francesco Paissan
 
 
 compilation_flags=("O0" "O1" "O2" "O3")

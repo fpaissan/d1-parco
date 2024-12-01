@@ -1,3 +1,7 @@
+/*
+ * Author: Francesco Paissan, 2024
+ *
+ */
 #ifndef __FUNC_H__
 #define __FUNC_H__
 

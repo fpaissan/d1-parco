@@ -1,4 +1,5 @@
 #!/bin/bash
+# Author: Francesco Paissan
 
 # List of flags to test
 FLAGS=(

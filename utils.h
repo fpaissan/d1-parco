@@ -1,3 +1,7 @@
+/*
+ * Author: Francesco Paissan, 2024
+ *
+ */
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
