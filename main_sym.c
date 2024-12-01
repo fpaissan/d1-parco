@@ -10,16 +10,14 @@
 
 #define REPEAT_MEASURES 2000
 
-int main(int argc, char*argv[])
-{
+int main(int argc, char*argv[]) {
 
     ExpSetup set = parse_setup(argc, argv);
 
     if(set.DEBUG) printf("DEBUG: Allocating matrix M of size %ld.\n", set.N);
     float* M = (float*)malloc(set.N * set.N * sizeof(float));
 
-    if(M == NULL)
-    {
+    if(M == NULL) {
         fprintf(stderr, "Could not initial matrix of size %s.\n", argv[1]);
     }
 
@@ -38,22 +36,16 @@ int main(int argc, char*argv[])
     long seconds, microseconds;
     double elapsed, delta;
     bool sym;
-    for(int i=0; i<REPEAT_MEASURES; i++)
-    {
-        if(set.STRAT == SEQUENTIAL)
-        {
+    for(int i=0; i<REPEAT_MEASURES; i++) {
+        if(set.STRAT == SEQUENTIAL) {
             gettimeofday(&start, NULL);
             sym = checkSym(M, set.N);
             gettimeofday(&end, NULL);
-        }
-        else if(set.STRAT == IMPLICIT)
-        {
+        } else if(set.STRAT == IMPLICIT) {
             gettimeofday(&start, NULL);
             sym = checkSymImp(M, set.N);
             gettimeofday(&end, NULL);
-        }
-        else if(set.STRAT == OMP)
-        {
+        } else if(set.STRAT == OMP) {
             gettimeofday(&start, NULL);
             sym = checkSymOMP(M, set.N);
             gettimeofday(&end, NULL);
@@ -67,14 +59,10 @@ int main(int argc, char*argv[])
     }
     elapsed /= REPEAT_MEASURES;
 
-    if (set.DEBUG)
-    {
-        if(sym)
-        {
+    if (set.DEBUG) {
+        if(sym) {
             printf("DEBUG: Matrix is symmetric.\n");
-        }
-        else
-        {
+        } else {
             printf("DEBUG: Matrix is NOT symmetric.\n");
         }
     }

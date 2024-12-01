@@ -11,8 +11,7 @@
 #define REPEAT_MEASURES 2000
 #define ALIGNMENT 32  // bytes
 
-int main(int argc, char*argv[])
-{
+int main(int argc, char*argv[]) {
 
     ExpSetup set = parse_setup(argc, argv);
 
@@ -22,13 +21,11 @@ int main(int argc, char*argv[])
     float* M = (float*)aligned_alloc(ALIGNMENT, set.N * set.N * sizeof(float));
     float* T = (float*)aligned_alloc(ALIGNMENT, set.N * set.N * sizeof(float));
 
-    if(M == NULL || T == NULL)
-    {
+    if(M == NULL || T == NULL) {
         fprintf(stderr, "Could not initial matrix of size %s.\n", argv[1]);
     }
 
-    if(set.DEBUG)
-    {
+    if(set.DEBUG) {
         printf("DEBUG: Checking alignment for M:");
         check_alignment(M, 32);
         printf("DEBUG: Checking alignment for T:");
@@ -47,40 +44,28 @@ int main(int argc, char*argv[])
 
     long seconds, microseconds;
     double elapsed, delta;
-    for(int i=0; i<REPEAT_MEASURES; i++)
-    {
-        if(set.STRAT == SEQUENTIAL)
-        {
+    for(int i=0; i<REPEAT_MEASURES; i++) {
+        if(set.STRAT == SEQUENTIAL) {
             gettimeofday(&start, NULL);
             matTranspose(M, T, set.N);
             gettimeofday(&end, NULL);
-        }
-        else if(set.STRAT == IMPLICIT)
-        {
+        } else if(set.STRAT == IMPLICIT) {
             gettimeofday(&start, NULL);
             matTransposeImp(M, T, set.N);
             gettimeofday(&end, NULL);
-        }
-        else if(set.STRAT == TILED)
-        {
+        } else if(set.STRAT == TILED) {
             gettimeofday(&start, NULL);
             matTransposeTiled(M, T, set.N, 64);
             gettimeofday(&end, NULL);
-        }
-        else if(set.STRAT == TILEDOMP)
-        {
+        } else if(set.STRAT == TILEDOMP) {
             gettimeofday(&start, NULL);
             matTransposeTiledOMP(M, T, set.N, 64);
             gettimeofday(&end, NULL);
-        }
-        else if(set.STRAT == OMP)
-        {
+        } else if(set.STRAT == OMP) {
             gettimeofday(&start, NULL);
             matTransposeOMP(M, T, set.N);
             gettimeofday(&end, NULL);
-        }
-        else if(set.STRAT == CO)
-        {
+        } else if(set.STRAT == CO) {
             gettimeofday(&start, NULL);
             matTranspose_CO(M, T, set.N, 0, set.N, 0, set.N);
             gettimeofday(&end, NULL);
@@ -96,14 +81,10 @@ int main(int argc, char*argv[])
 
     if(set.DEBUG) printf("Elapsed: %.6f s\n", elapsed);
 
-    if(set.DEBUG)
-    {
-        if(checkTranspose(M, T, set.N))
-        {
+    if(set.DEBUG) {
+        if(checkTranspose(M, T, set.N)) {
             printf("DEBUG: Transpose successful.\n");
-        }
-        else
-        {
+        } else {
             printf("DEBUG: Something is off in transpose. DO NOT IGNORE THIS!\n");
         }
     }
