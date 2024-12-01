@@ -13,11 +13,15 @@ if __name__ == "__main__":
     TASK = sys.argv[1]
     OPT = sys.argv[2]
 
-    STRATEGIES = ["SEQ", "IMP", "OMP"]
+    if TASK == "symm":
+        STRATEGIES = ["SEQ", "IMP", "OMP"]
+    else:
+        STRATEGIES = ["SEQ", "IMP", "OMP", "TILED", "TILEDOMP", "CO"]
+
     LOGS = []
     for s in STRATEGIES:
         for pow in range(4, 13):
-            if s != "OMP":
+            if not "OMP" in s:
                 THREADS = [1]
             else:
                 THREADS = [5, 15, 30, 40]
@@ -101,6 +105,6 @@ if __name__ == "__main__":
 
         # Show or save the plot
         plt.tight_layout()
-        plt.savefig(output_folder / f"{sys.argv[1]}_{strategy}_t{threads}.pdf")
+        plt.savefig(output_folder / f"{OPT}_{strategy}_t{threads}.pdf")
         plt.cla()
         plt.clf()
